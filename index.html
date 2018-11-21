@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.2.8/d3.min.js" type="text/JavaScript">
+</script>
+</head>
+<body>
+<style>
+    .tick line {
+        stroke: #ccc;
+    }
+</style>
+<svg style="width: 1400px; height: 800px; border: 1px solid black;"></svg>
+<script>
+    
+    d3.csv("score.csv", lineChart) 
+    function lineChart(data) {
+         
+        var xScale = d3.scaleOrdinal().domain(["Arsenal", "Bournemouth", "Brighton", "Burnley", "Cardiff City",
+                               "Chelsea", "Crystal Palace", "Everton", "Fulham", "Huddersfield", "Leicester City",
+                               "Liverpool", "Man City", "Man United", "NewCastle", "Southampton", "Tottenham FC",
+                               "Watford", "Westham", "Wolves"]).range([20, 70, 140, 210, 280, 350, 420, 490, 560, 630, 700, 770, 840, 910, 980,
+                                                                          1050, 1120, 1190, 1260, 1330])
+        var yScale = d3.scaleLinear().domain([0,40]).range([480,20]) 
+        
+        
+        var xAxis = d3.axisBottom()
+                   .scale(xScale)
+                   .tickSize(500);
+        
+        d3.select("svg")
+            .append("g")
+            .attr("transform", `translate(0, 0)`)
+            .attr("id", "xAxisG")
+            .call(xAxis);
+        
+        var yAxis = d3.axisRight()
+           .scale(yScale)
+           .ticks(22)
+           .tickSize(1360)
+        
+        d3.select("svg")
+            .append("g")
+            .attr("transform", `translate(0, 0)`)
+            .attr("id", "yAxisG")
+            .call(yAxis);
+        
+        d3.select("svg").selectAll("circle.wins")
+                       .data(data)
+                       .enter()
+                       .append("circle")
+                       .attr("class", "Wins")
+                       .attr("r", 5)
+                       .attr("cx", d => xScale(d.Teams))
+                       .attr("cy", d => { return yScale(d.Win);})
+                       .style("fill", "purple")
+        d3.select("svg").selectAll("circle.draw")
+                       .data(data)
+                       .enter()
+                       .append("circle")
+                       .attr("class", "Draw")
+                       .attr("r", 5)
+                       .attr("cx", d => xScale(d.Teams))
+                       .attr("cy", d => yScale(d.Draw))
+                       .style("fill", "brown")
+        d3.select("svg").selectAll("circle.loss")
+                       .data(data)
+                       .enter()
+                       .append("circle")
+                       .attr("class", "Loss")
+                       .attr("r", 5)
+                       .attr("cx", d => xScale(d.Teams))
+                       .attr("cy", d => yScale(d.Loss))
+                       .style("fill", "orange")
+        
+        const lambdaXScale = d => xScale(d.Teams)
+        var winLine = d3.line()
+            .x(lambdaXScale)
+            .y(d => yScale(d.Win))
+        var drawLine = d3.line()
+            .x(lambdaXScale)
+            .y(d => yScale(d.Draw))
+        var lossLine = d3.line()
+            .x(lambdaXScale)
+            .y(d => yScale(d.Loss));
+        
+        winLine.curve(d3.curveStep)
+        drawLine.curve(d3.curveStep)
+        lossLine.curve(d3.curveStep)
+        
+        d3.select("svg")
+            .append("path")
+            .attr("d", winLine(data))
+            .attr("fill", "none")
+            .attr("stroke", 'purple')
+            .attr("stroke-width", 2);
+        
+        d3.select("svg")
+            .append("path")
+            .attr("d", drawLine(data))
+            .attr("fill", "none")
+            .attr("stroke", "brown")
+            .attr("stroke-width", 2);
+        
+        d3.select("svg")
+            .append("path")
+            .attr("d", lossLine(data))
+            .attr("fill", "none")
+            .attr("stroke", 'orange')
+            .attr("stroke-width", 2);
+        }
+    
+</script>
+</body>
+</html>
